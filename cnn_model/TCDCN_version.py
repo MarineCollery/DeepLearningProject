@@ -15,6 +15,7 @@ set_random_seed(2)
 
 ##################################   INIT     ################################
 batch_size = 100
+learning_rate = 1e-3 #1e-4
 # 20% of the data will automatically be used for validation
 validation_size = 0.2
 img_size = 150
@@ -65,7 +66,7 @@ def create_convolutional_layer(input,num_input_channels,conv_filter_size,num_fil
     biases = create_biases(num_filters)
     ## Create the convolutional layer
     layer = tf.nn.conv2d(input=input,  filter=weights, strides=[1, 1, 1, 1],  padding="VALID")
-    layer += biases
+    layer = tf.nn.bias_add(layer, biases)
     ## Output of pooling is fed to Relu which is the activation function for us.
     layer = tf.nn.relu(layer)
     return layer
@@ -155,7 +156,7 @@ session.run(tf.global_variables_initializer())
 cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=layer_fc2,
                                                         labels=y_true)
 cost = tf.reduce_mean(cross_entropy)
-optimizer = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(cost)
+optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 correct_prediction = tf.equal(y_pred_cls, y_true_cls)
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
