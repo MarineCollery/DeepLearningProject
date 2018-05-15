@@ -1,9 +1,4 @@
 import tensorflow as tf
-import time
-from datetime import timedelta
-import math
-import random
-import numpy as np
 import load_dataset
 
 #Adding Seed so that random initialization is consistent
@@ -12,24 +7,35 @@ seed(1)
 from tensorflow import set_random_seed
 set_random_seed(2)
 
-
 ##################################   INIT     ################################
 batch_size = 100
 learning_rate = 1e-3 #1e-4
-# 20% of the data will automatically be used for validation
-validation_size = 0.2
+validation_size = 0.2 # 20% of the data will automatically be used for validation
 img_size = 150
 num_channels = 3 #RGB (if grey scale, num_channels=1)
-#num_classes = 2 #len(target_names) - 1
-classes = ['not_smiling','smiling'] # 0 = no smiling, 1=smiling
-# classes = ['female','male'] # 0 = no smiling, 1=smiling
-num_classes = len(classes)
-train_path='../dataset/dataset_smile/'
-model_dir= '/smile-model/smile.ckpt'
-# train_path='../dataset/dataset_gender/'
-# model_dir= '/gender-model/gender.ckpt'
+
+smile_gender = 1 # 1= smile data, 0 = gender data
+classes1 = ['not_smiling','smiling'] # 0 = no smiling, 1=smiling
+classes2 = ['female','male'] # 0 = no smiling, 1=smiling
+num_classes = len(classes1)
+train_path1='../dataset/dataset_smile_cropped/'
+model_dir1= './smile-model-cascade/smile.ckpt'
+train_path2='../dataset/dataset_gender_cropped/'
+model_dir2= './gender-model-cascade/gender.ckpt'
 #load all the training and validation images and labels into memory
-data = load_dataset.read_train_sets(train_path, img_size, classes, validation_size=validation_size)
+data1 = load_dataset.read_train_sets(train_path1, img_size, classes1, validation_size=validation_size)
+data2 = load_dataset.read_train_sets(train_path2, img_size, classes2, validation_size=validation_size)
+
+if smile_gender==1:
+    data= data1
+    model_dir= model_dir1
+    train_path = train_path1
+else:
+    data= data2
+    model_dir= model_dir2
+    train_path = train_path2
+
+
 print("Complete reading input data.")
 print("Number of files in Training-set:\t\t{}".format(len(data.train.labels)))
 print("Number of files in Validation-set:\t{}".format(len(data.valid.labels)))
@@ -38,7 +44,7 @@ session = tf.Session()
 x = tf.placeholder(tf.float32, shape=[None, img_size,img_size,num_channels], name='x')
 ## labels
 y_true = tf.placeholder(tf.float32, shape=[None, num_classes], name='y_true')
-y_true_cls = tf.argmax(y_true, dimension=1)
+y_true_cls = tf.argmax(y_true, axis=1)
 W = tf.Variable(tf.zeros([150 * 150, num_classes]))
 b = tf.Variable(tf.zeros([num_classes]))
 
@@ -209,9 +215,7 @@ layer_fc1 = create_fc_layer(input=layer_flat, num_inputs=layer_flat.get_shape()[
 layer_fc2 = create_fc_layer(input=layer_fc1, num_inputs=fc_layer_size, num_outputs=num_classes, use_relu=False)
 
 y_pred = tf.nn.softmax(layer_fc2, name='y_pred')
-
-y_pred_cls = tf.argmax(y_pred, dimension=1)
-session.run(tf.global_variables_initializer())
+y_pred_cls = tf.argmax(y_pred, axis=1)
 cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=layer_fc2,
                                                         labels=y_true)
 cost = tf.reduce_mean(cross_entropy)
@@ -223,6 +227,4 @@ session.run(tf.global_variables_initializer())
 total_iterations = 0
 saver = tf.train.Saver()
 
-#train(num_iteration=3000)
-train(num_iteration=3000)
-
+train(num_iteration=50000)
