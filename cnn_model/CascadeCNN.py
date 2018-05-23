@@ -1,3 +1,10 @@
+##########################################################################################
+# Authors: Anna Canal, Marine Collery, Sandra Picó
+# Data: MTFL Dataset: http://mmlab.ie.cuhk.edu.hk/projects/TCDCN.html
+# Description: Code for training a CNN with MTFL dataset, taking smiling and gender attributes
+# Code based on the tutorial : http://cv-tricks.com/tensorflow-tutorial/training-convolutional-neural-network-for-image-classification/
+###############################################################################################
+
 import tensorflow as tf
 import load_dataset
 
@@ -78,20 +85,6 @@ def create_convolutional_layer(input,num_input_channels,conv_filter_size,num_fil
     ## Output of pooling is fed to Relu which is the activation function for us.
     layer = tf.nn.relu(layer)
     return layer
-
-
-def create_localconvolutional_layer(input,num_input_channels,conv_filter_size,num_filters):
-    weights = create_weights(shape=[conv_filter_size, conv_filter_size, num_input_channels, num_filters])
-    biases = create_biases(num_filters)
-    ## Create the convolutional layer
-    layer = tf.keras.layers.LocallyConnected2D(filters=num_filters, kernel_size =[conv_filter_size,conv_filter_size],
-                                               strides=[1, 1, 1, 1], padding = "valid", activation=tf.nn.relu,
-                                               use_bias= True, kernel_initializer= input, bias_initializer= biases)
-    #layer += biases
-    ## Output of pooling is fed to Relu which is the activation function for us.
-    #layer = tf.nn.relu(layer)
-    return layer
-
 
 def create_pool_layer(layer):
     ##max-pooling.
@@ -194,8 +187,6 @@ layer_pool2 = create_pool_layer(layer_conv2)
 
 layer_conv3 = create_convolutional_layer(input=layer_pool2, num_input_channels=num_filters_conv2,
                                          conv_filter_size=filter_size_conv3, num_filters=num_filters_conv3)
-# layer_conv3 = create_localconvolutional_layer(input=layer_pool2, num_input_channels=num_filters_conv2,
-#                                          conv_filter_size=filter_size_conv3, num_filters=num_filters_conv3)
 
 layer_pool3 = create_pool_layer(layer_conv3)
 
