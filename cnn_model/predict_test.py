@@ -1,12 +1,9 @@
 import tensorflow as tf
 import numpy as np
 import load_dataset
-from sklearn.metrics import confusion_matrix
-
-
 
 # First, pass the path of the image
-smile_gender = 1 # 1= smile data, 0 = gender data
+smile_gender = 1# 1= smile data, 0 = gender data
 
 test_path1= '../dataset/dataset_smile_test/'
 test_path2= '../dataset/dataset_gender_test/'
@@ -31,13 +28,7 @@ data = load_dataset.read_test_set(test_path,image_size,classes)
 x_batch, y_true_batch, _, cls_batch = data.test.next_batch(batch_size)
 
 ##### Chose model path ######
-model_path1= './smile-model-cascade/'
-model_path2= './gender-model-cascade/'
-model_path3= './smile-model-tcdcn/'
-model_path4= './gender-model-tcdcn/'
-model_path5 = './Model-gender-250/'
-
-model_path = model_path1
+model_path = './Model-125/'
 
 
 # Restore the saved model
@@ -55,6 +46,7 @@ x= graph.get_tensor_by_name("x:0")
 y_true = graph.get_tensor_by_name("y_true:0")
 y_true_cls = tf.argmax(y_true, axis=1)
 
+
 # Creating the feed_dict that is required to be fed to calculate y_pred
 feed_dict_testing = {x: x_batch,  y_true: y_true_batch}
 result=session.run(y_pred, feed_dict=feed_dict_testing) # result format: [probabiliy_of_smile probability_of_non-smiling]
@@ -62,30 +54,17 @@ y_pred_cls = tf.argmax(result, axis=1)
 # Accuracy
 correct_prediction = tf.equal(y_pred_cls, y_true_cls)
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+precision, pres_op = tf.metrics.precision(y_true_cls,y_pred_cls)
+recall, rec_op = tf.metrics.recall(y_true_cls, y_pred_cls)
 acc = session.run(accuracy, feed_dict=feed_dict_testing)
 msg = "Testing Accuracy of "+model_path5+"  {0:>6.1%}"
 print(msg.format(acc))
+session.run(tf.global_variables_initializer())
+session.run(tf.local_variables_initializer())
+pres = session.run(pres_op, feed_dict=feed_dict_testing)
+rec = session.run(rec_op, feed_dict=feed_dict_testing)
+print('Final Recall: %f' % (rec))
+print('Final Precision: %f' % ( pres))
 
 
-## Calcular confusion matrix amb tensorflow? ######
 
-#y_true_cls = tf.cast(y_true_cls, tf.int64)
-#y_pred_cls = tf.cast(y_pred_cls, tf.int64)
-#cnf_test = tf.confusion_matrix(labels=y_true_cls, predictions=y_pred_cls, num_classes=2, dtype=tf.int64)#, dtype=tf.int32)
-#print(cnf_test)
-# con_mat = tf.confusion_matrix(labels=[0, 1], predictions=correct_prediction, num_classes=2, dtype=tf.int32, name=None)
-# print(con_mat)
-# with tf.Session():
-#     print('Confusion Matrix: \n\n', tf.Tensor.eval(con_mat,feed_dict=None, session=None))
-
-
-#test_op,accuracy,confusion=get_streaming_metrics(y_pred_cls,y_true_cls,2)
-# confusion matrix
-#fig = plt.figure()
-#print(y_pred_cls(0))
-#cnf_test = confusion_matrix(y_true_cls, y_pred_cls, labels=[0, 1])
-#plot_confusion_matrix(cnf_test, classes=[0,1], normalize=False, title='Test confusion matrix normalized')
-
-#cm = session.run(confusion_matrix)
-
-#session.eval(confusi
