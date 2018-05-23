@@ -10,22 +10,15 @@ if [ $# -ne 2 ]
    		read path_dataset 
    		echo "${red}Enter the path of the directory for the final datasets (tensorflow)${reset}"
    		read path_tensor
-   		# echo "${red}Enter the path of the directory for the output temporary .wav files${reset}"
-   		# read path_output 
-   		# echo "${red}Enter the path of the directory for the output .csv files with the extracted features${reset}"
-   		# read path_output_csv 
+
 else
     path_dataset=$1 
     echo ${path_dataset};
     path_tensor=$2 
     echo ${path_tensor};
-    # path_output=$3 
-    # echo ${path_output};
-    # path_output_csv=$4 
-    # echo ${path_output_csv};
+
 fi
 
-# cat ${path_dataset}/testing.txt | cut -d ' ' -f2,13,14,15,16 > temp.txt
 cat ${path_dataset}/training.txt | cut -d ' ' -f2,13,14,15,16 > temp1.txt
 
 # --gender:     1 for male, 2 for female
@@ -72,8 +65,6 @@ rm glasses.sh
 rm head_pose.sh
 rm all.sh
 
-# name=`basename ${path_dataset}/${name_file}`
-# cp ${path_dataset}/${name_file} ${path_tensor}/dataset_gender/${name}
 
 while read name_file gender smile wearing_glasses head_pose; do
   
@@ -144,3 +135,11 @@ while read name_file gender smile wearing_glasses head_pose; do
   fi
 
 done < temp1.txt
+
+rm temp1.txt
+
+bash gender.sh
+bash smile.sh
+bash wearing_glasses.sh
+bash head_pose.sh
+bash all.sh

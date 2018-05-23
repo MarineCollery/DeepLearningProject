@@ -137,7 +137,7 @@ FLAGS = None
 MAX_NUM_IMAGES_PER_CLASS = 2 ** 27 - 1  # ~134M
 
 # The location where variable checkpoints will be stored.
-CHECKPOINT_NAME = '/Volumes/Marine_WD_Elements/DL_PRETRAINED/tmp2/_retrain_checkpoint'
+CHECKPOINT_NAME = '/tmp/_retrain_checkpoint'
 
 # A module is understood as instrumented for quantization with TF-Lite
 # if it contains any of these ops.
@@ -203,24 +203,27 @@ def create_image_lists(image_dir, testing_percentage, validation_percentage):
       # grouping photos that are close variations of each other. For example
       # this is used in the plant disease data set to group multiple pictures of
       # the same leaf.
-      hash_name = re.sub(r'_nohash_.*$', '', file_name)
-      # This looks a bit magical, but we need to decide whether this file should
-      # go into the training, testing, or validation sets, and we want to keep
-      # existing files in the same set even if more files are subsequently
-      # added.
-      # To do that, we need a stable way of deciding based on just the file name
-      # itself, so we do a hash of that and then use that to generate a
-      # probability value that we use to assign it.
-      hash_name_hashed = hashlib.sha1(tf.compat.as_bytes(hash_name)).hexdigest()
-      percentage_hash = ((int(hash_name_hashed, 16) %
-                          (MAX_NUM_IMAGES_PER_CLASS + 1)) *
-                         (100.0 / MAX_NUM_IMAGES_PER_CLASS))
-      if percentage_hash < validation_percentage:
-        validation_images.append(base_name)
-      elif percentage_hash < (testing_percentage + validation_percentage):
-        testing_images.append(base_name)
+      if "test_" in base_name:
+          testing_images.append(base_name)
       else:
-        training_images.append(base_name)
+        hash_name = re.sub(r'_nohash_.*$', '', file_name)
+        # This looks a bit magical, but we need to decide whether this file should
+        # go into the training, testing, or validation sets, and we want to keep
+        # existing files in the same set even if more files are subsequently
+        # added.
+        # To do that, we need a stable way of deciding based on just the file name
+        # itself, so we do a hash of that and then use that to generate a
+        # probability value that we use to assign it.
+        hash_name_hashed = hashlib.sha1(tf.compat.as_bytes(hash_name)).hexdigest()
+        percentage_hash = ((int(hash_name_hashed, 16) %
+                            (MAX_NUM_IMAGES_PER_CLASS + 1)) *
+                           (100.0 / MAX_NUM_IMAGES_PER_CLASS))
+        if percentage_hash < validation_percentage:
+          validation_images.append(base_name)
+        # elif percentage_hash < (testing_percentage + validation_percentage):
+        #   testing_images.append(base_name)
+        else:
+          training_images.append(base_name)
     result[label_name] = {
         'dir': dir_name,
         'training': training_images,
