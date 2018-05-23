@@ -1,3 +1,9 @@
+##########################################################################################
+# Authors: Anna Canal, Marine Collery, Sandra Picó
+# Data: MTFL Dataset: http://mmlab.ie.cuhk.edu.hk/projects/TCDCN.html
+# Description: Code for predict smiling and gender attributes from MTFL data. Metrics: Accuracy, Precision and Recall
+# Code based on the tutorial : http://cv-tricks.com/tensorflow-tutorial/training-convolutional-neural-network-for-image-classification/
+###############################################################################################
 import tensorflow as tf
 import numpy as np
 import load_dataset
