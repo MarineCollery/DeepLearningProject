@@ -1,3 +1,9 @@
+##########################################################################################
+# Authors: Anna Canal, Marine Collery, Sandra Picó
+# Data: MTFL Dataset: http://mmlab.ie.cuhk.edu.hk/projects/TCDCN.html
+# Description: Read data from MTFL. Prepare gender or smiling dataset for training, validation and test
+# Code based on the tutorial : http://cv-tricks.com/tensorflow-tutorial/training-convolutional-neural-network-for-image-classification/
+###############################################################################################
 import cv2
 import os
 import glob
