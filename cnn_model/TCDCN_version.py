@@ -1,3 +1,10 @@
+##########################################################################################
+# Authors: Anna Canal, Marine Collery, Sandra Picó
+# Data: MTFL Dataset: http://mmlab.ie.cuhk.edu.hk/projects/TCDCN.html
+# Description: Code for training a CNN with MTFL dataset, based on TCDCN, taking smiling and gender attributes
+# Code based on the tutorial : http://cv-tricks.com/tensorflow-tutorial/training-convolutional-neural-network-for-image-classification/
+###############################################################################################
+
 import tensorflow as tf
 import load_dataset
 
@@ -170,6 +177,5 @@ session.run(tf.global_variables_initializer())
 total_iterations = 0
 saver = tf.train.Saver()
 
-#train(num_iteration=3000)
 train(num_iteration=3000)
 
